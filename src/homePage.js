@@ -1,10 +1,22 @@
 import React, { Component } from 'react';
-import { AppRegistry, Platform, StyleSheet, Text, View, TextInput, Picker } from 'react-native';
+import { AppRegistry, Platform, StyleSheet, Text, View, TextInput, Picker, Image } from 'react-native';
 import { Button, ButtonGroup, Icon } from 'react-native-elements';
-import  MultiSlider  from '@ptomasroos/react-native-multi-slider';
+//import  MultiSlider  from '@ptomasroos/react-native-multi-slider';
 
 
+import GoogleStaticMap from 'react-native-google-static-map'
 
+
+const mockLocation = {
+    latitude: '30.429515',
+    longitude: '-84.286488',
+    zoom: 5,
+    size: {
+        width: 200,
+        height: 200
+    },
+    apiKey: "AIzaSyCNDhPLM_w7KafyH3NoxY1E3gpqkgZStyk"
+}
 
 export default class HomePage extends Component {
 
@@ -32,14 +44,15 @@ export default class HomePage extends Component {
             <View style={{
                 flexDirection: 'row',
                 flex: 1,
-                backgroundColor: '#FEFEFE'
+                backgroundColor: '#F5FCFF'
             }}>
                 <View style={{
                     justifyContent: 'center',
-                    
+                    alignContent: 'center'
+
                 }}>
-                    <Icon name="menu" onPress={() => this.props.navigation.toggleDrawer()} />
-            </View>
+                    <Icon name="dots-vertical" type="material-community" onPress={() => this.props.navigation.toggleDrawer()} />
+                </View>
             <View style={styles.container}>
 
 
@@ -67,8 +80,17 @@ export default class HomePage extends Component {
 
                 </Picker>
 
-                <Text style={{ marginTop: 20 }}> Meeting Location </Text>
+                    <Text style={{ marginTop: 20 }}> Meeting Location </Text>
+                    <View style={styles.mapStyle}>
+                        <Image
+                            style={{ height: 200, marginRight: 15 }}
+                            source={require('./colemanMap.png')}
+                           
+                    />
 
+                    
+
+                    </View>
 
                 <Button buttonStyle={styles.buttonContainer}
                     onPress={() =>                
@@ -107,7 +129,7 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         margin: 20,
-        alignContent: 'flex-end'
+        bottom: 0,
     },
     welcome: {
         fontSize: 40,
@@ -144,5 +166,13 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         alignItems: 'center',
 
+    },
+
+    mapStyle: {
+        borderRadius: 5,
+        borderColor: 'gray',
+        borderWidth: 1
     }
+
+
 });

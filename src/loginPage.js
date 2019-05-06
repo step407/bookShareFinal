@@ -1,31 +1,22 @@
 import React, { Component } from 'react';
-import { AppRegistry, Platform, StyleSheet, Text, View, TextInput, Alert } from 'react-native';
+import { AppRegistry, Platform, StyleSheet, Text, View, TextInput } from 'react-native';
 import { Button } from 'react-native-elements'
+import firebase from 'react-native-firebase';
 
 
 
 export default class LoginPage extends Component {
 
-  constructor(props){
+    state = { email: '', password: '', errorMessage: null }
 
-      super(props)
-      this.state={
-        TextInputValue:''
-      , TextInputValue2: ''
-      }
-
-  }
-
-printDetails = () =>{
-    const{TextInputValue}=this.state;
-    Alert.alert(TextInputValue)
-}
-
-printDetails2 = () =>{
-    const{TextInputValue2}=this.state;
-    Alert.alert(TextInputValue2)
-}
-
+    handleLogin = () => {
+        const { email, password } = this.state
+        firebase
+            .auth()
+            .signInWithEmailAndPassword(email, password)
+            .then(() => this.props.navigation.navigate('HomePage'))
+            .catch(error => this.setState({ errorMessage: error.message }))
+    }
 
     render() {
         return (
@@ -33,6 +24,11 @@ printDetails2 = () =>{
 
             <View style={styles.container}>
                 <Text style={styles.welcome}>BookShare</Text>
+
+                {this.state.errorMessage &&
+                    <Text style={{ color: 'red' }}>
+                        {this.state.errorMessage}
+                    </Text>}
 
                 <TextInput style={{
                     height: 40,
@@ -43,8 +39,9 @@ printDetails2 = () =>{
                 }}
                     keyboardType='email-address'
                     placeholder='Enter email address'
+                    onChangeText={email => this.setState({ email })}
+                    value={this.state.email}
 
-                   onChangeText={TextInputValue=>this.setState({TextInputValue})}
                 />
 
                 <TextInput style={{
@@ -58,19 +55,16 @@ printDetails2 = () =>{
                     placeholder='Enter password'
                     secureTextEntry={true}
                     caretHidden={true}
-
-                     onChangeText={TextInputValue2=>this.setState({TextInputValue2})}
+                    onChangeText={password => this.setState({ password })}
+                    value={this.state.password}
 
                 />
 
 
 
                 <Button buttonStyle={styles.buttonContainer}
-                  //  onPress={() => this.props.navigation.navigate('HomePage')}
-
-                   onPress={this.printDetails2}
-
-                   title='continue'
+                    onPress={this.handleLogin}
+                    title="Continue"
                     color="#007FEB"
                     accessibilityLabel="Buy Some Books!"
                 />

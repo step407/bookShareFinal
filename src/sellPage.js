@@ -1,129 +1,156 @@
 import React, { Component } from 'react';
-import { AppRegistry, Platform, StyleSheet, Text, View, TextInput, Picker } from 'react-native';
+import { AppRegistry, Platform, StyleSheet, Text, View, TextInput, Picker, ActivityIndicator } from 'react-native';
 import { Button, Card, Icon, Image, ListItem, Avatar, Divider } from 'react-native-elements';
-import MultiSlider from '@ptomasroos/react-native-multi-slider';
-import SearchConditions from './homePage'
-
-/*
- *            <Card
-
-                    containerStyle={{ flexDirection: 'row' }}
-                    title="Go Sound the Trumpet"
-                >
+import {DrawerItems} from 'react-navigation'
+import BookListing from './bookListing'
+import { ScrollView, FlatList } from 'react-native-gesture-handler';
+import firebase from 'react-native-firebase'
 
 
-                    <Text style={{ marginBottom: 10, alignContent: 'center' }}>
-                        David H Jackson
-                    </Text>
-                    <Text style={{ marginBottom: 10,  }}>
-                        Edition: 1
-                    </Text>
-                    <Button
-                        icon={<Icon name='code' color='#ffffff' />}
-                        backgroundColor='#03A9F4'
-                        buttonStyle={{ borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0 }}
-                        title='VIEW NOW' />
-                </Card>
-                */
+
 
 
 
 export default class SellersPage extends Component {
 
+    state = {
+        listings: [],
+        user: ''
+
+    }
 
 
+    componentDidMount() {
+        const userID = firebase.auth().currentUser.uid
+        
+        this.setState({user: userID})
+        const ref = firebase.database().ref(`/bookListings/`)
+
+        ref.on('value', (childSnapshot) => {
+            var books = [];
+            childSnapshot.forEach((item) => {
+                books.push({
+                    key: item.key,
+                    data: item.val()
+
+                });
+                this.setState({ listings: books })
+            });
+            
+        });
+    }
+
+
+    
 
     render() {
         return (
 
 
-            <View style={styles.container}>
-                <Card
+            <View style={{
+                flexDirection: 'row',
+                flex: 1,
+                backgroundColor: '#F5FCFF'
+            }}>
+                <View style={{
+                    justifyContent: 'center',
+                    alignContent: 'center'
 
-                    containerStyle={styles.cardContain}
+                }}>
+                    <Icon name="dots-vertical" type="material-community" onPress={() => this.props.navigation.toggleDrawer()} />
+              
+                </View>
+                <View style={{ flex: 1 }}>
+                    <FlatList
+                        data={this.state.listings}
 
+                        renderItem={({ item, index }) => {
+                            return (
+                                <Card
 
-                >
-
-                    <View style={styles.container2} >
-                        <Image
-                            resizeMode='cover'
-                            source={require('./dummy_gstt.jpg')}
-                            imageStyle={styles.img}
-
-                        />
-
-
-                        <View>
-                            <View>
-                                <Text style={styles.txt}> step407 [4.7]</Text>
-
-                            </View>
-                            <Text style={{
-                                textAlign: 'right',
-                                flexDirection: 'row-reverse',
-                                alignItems: 'flex-end',
-                                justifyContent: 'flex-end',
-                                textAlignVertical: 'bottom',
-                                alignContent: 'flex-end',
-                                fontSize: 24,
-                                fontWeight: 'bold'
-
-                            }}>Go Sound The Trumpet</Text>
-                            <Text style={{
-                                textAlign: 'right',
-                                flexDirection: 'row-reverse',
-                                alignItems: 'flex-end',
-                                justifyContent: 'flex-end',
-                                textAlignVertical: 'bottom',
-                                alignContent: 'flex-end',
-                                fontSize: 18,
-                                fontWeight: 'bold'
-
-                            }} >
-                                David H Jackson
-                        </Text>
-                            <Text style={styles.tStyle} >
-                                Edition: 1
-                        </Text>
-                            <View style={styles.buttonContainer} >
-
-                                <Button
-                                    icon={<Icon name='code' color='#ffffff' />}
-                                    backgroundColor='#03A9F4'
-                                    buttonStyle={styles.button}
-                                    containerStyle={styles.buttoncContainer}
+                                    containerStyle={styles.cardContain}
 
 
-                                    title='Add to Cart' />
-                                <Button
-                                    icon={<Icon name='code' color='#ffffff' />}
-                                    backgroundColor='#03A9F4'
-                                    buttonStyle={styles.button}
-                                    containerStyle={styles.buttoncContainer}
-                                    title='Contact Seller' />
-                            </View>
+                                >
 
-                        </View>
+                                    <View style={styles.container2} >
+                                        <Image
+                                            resizeMode='cover'
+                                            source={{ uri: item.data.photo }  }
+                                            imageStyle={styles.img}
+                                            PlaceholderContent={<ActivityIndicator />}
 
-
-
-                    </View>
-                </Card>
-
-                <Button buttonStyle={styles.buttonContainer}
-                    onPress={() =>
-
-                        this.props.navigation.toggleDrawer()
-
-                    }
-                    title="Search"
-                    color="#007FEB"
-                    accessibilityLabel="Buy Some Books!"
-                />
+                                        />
 
 
-            </View>
+                                        <View style={{
+                                            flex: 1
+                                        }}>
+                                            <View style={{}}>
+                                                <Text style={styles.usr}>{this.state.user}< Text style={styles.rating}>      [5.0 / 5.0]</ Text></Text>
+
+                                            </View>
+
+                                            <Text style={
+
+                                                styles.bookTitle
+                                            }>{item.data.bookTitle}</Text>
+                                            <Text style={{
+                                                textAlign: 'center',
+                                                flexDirection: 'row-reverse',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                textAlignVertical: 'bottom',
+                                                alignContent: 'center',
+                                                fontSize: 18,
+                                                fontWeight: 'bold'
+
+                                            }} >
+                                                {item.data.author}
+                                            </Text>
+                                            <Text style={styles.tStyle} >
+                                                Edition: {item.data.edition}
+                                            </Text>
+                                            <View style={styles.buttonContainer} >
+
+                                                <Button type='outline'
+                                                    icon={<Icon name='close' />}
+                                                    //backgroundColor='#03A9F4'
+                                                    buttonStyle={styles.button}
+                                                    containerStyle={styles.buttoncContainer}
+
+
+                                                />
+
+                                            </View>
+
+                                        </View>
+
+
+
+
+                                    </View>
+
+                                </Card>
+                            );
+                        }}
+                            
+                        >
+
+                            
+            
+                    </FlatList>
+                
+                        <Button
+                            icon={<Icon name='add' color='#ffffff' />}
+                            backgroundColor='#03A9F4'
+                            buttonStyle={{ borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0 }}
+                            title='Add Listing'
+                            onPress={() => this.props.navigation.navigate('AddListingPage')}/>
+                </View>
+
+                </View>
+            
 
 
 
@@ -155,16 +182,16 @@ const styles = StyleSheet.create({
     },
     buttoncContainer:
         {
-            flexBasis: 'auto',
+
             marginBottom: 0,
-            alignContent: 'flex-end'
+            alignContent: 'center'
         },
     buttonContainer: {
 
         flexDirection: 'row-reverse',
         flex: 1,
-        flexBasis: 'auto',
-        margin: 0
+        alignSelf: 'center',
+        margin: 5,
 
     },
     welcome: {
@@ -186,7 +213,7 @@ const styles = StyleSheet.create({
 
     button: {
 
-
+        alignSelf: 'center'
     },
 
     img: {
@@ -196,7 +223,7 @@ const styles = StyleSheet.create({
     },
 
     tStyle: {
-        textAlign: 'right',
+        textAlign: 'center',
         flexDirection: 'row-reverse',
         alignItems: 'flex-end',
         justifyContent: 'flex-end',
@@ -220,5 +247,34 @@ const styles = StyleSheet.create({
         textAlign: 'right',
         flexDirection: 'row'
 
-    }
+    },
+
+    usr: {
+        marginLeft: 10,
+        borderColor: 'gray',
+        backgroundColor: '#eeeeee',
+        minWidth: '32.5%',
+        textAlign: 'center',
+        fontWeight: '500',
+        fontSize: 14
+    },
+
+    rating: {
+        marginLeft: 10,
+        borderColor: 'gray',
+        backgroundColor: '#eeeeee',
+        minWidth: '32.5%',
+        textAlign: 'right',
+    },
+
+    bookTitle: {
+        textAlign: 'center',
+        flexDirection: 'row-reverse',
+        textAlignVertical: 'bottom',
+
+        fontSize: 24,
+        fontWeight: 'bold',
+
+
+    },
 });
